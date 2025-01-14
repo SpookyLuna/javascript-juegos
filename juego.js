@@ -28,74 +28,15 @@ function mostrartablero(){
     `);
 }
 
-function turnojugador(jugador){
-    let turno = prompt ("Introduce una celda [Ej: A1]: ");
-    if(turno.length == 2 && posiciones_validas.includes(turno[0].toUpperCase()) && Number(turno[1]) <= 3){
-        //Guardo fila y columna
-        let columna = posiciones_columnas[turno[0].toUpperCase()];
-        let fila = Number(turno[1])-1; //Resta uno ya que la matriz comienza en 0
-        console.log(matriz[fila][columna])
-        if(matriz[fila][columna] === " "){
-            if(jugador == jugador1){
-                console.log(columna, fila)
-                matriz[fila][columna] = "X";
-            }
-            else{
-                matriz[fila][columna] = "O";
-                console.log(columna, fila)
-            }
-        console.clear();
-        mostrartablero();
-        }
-        else{
-            console.log("Movimiento inválido!");
-        }
-    }
-    else{
-        console.log("Movimiento inválido!");
-    }
-}
-
-function comprobarganador(){
-    if ((matriz[0][0] != " " && matriz[0][1] != " " && matriz[0][2] != " ") &&
-        (matriz[1][0] != " " && matriz[1][1] != " " && matriz[1][2] != " ") &&
-        (matriz[2][0] != " " && matriz[2][1] != " " && matriz[2][2] != " ") &&
-        (matriz[0][0] != " " && matriz[1][1] != " " && matriz[2][2] != " ") &&
-        (matriz[0][2] != " " && matriz [1][1] != " " && matriz[2][0] != " ")){
-        if ((matriz[0][0] === "X" && matriz[0][1] === "X" && matriz[0][2] === "X") ||
-            (matriz[1][0] === "X" && matriz[1][1] === "X" && matriz[1][2] === "X") ||
-            (matriz[2][0] === "X" && matriz[2][1] === "X" && matriz[2][2] === "X")){
-                console.log("El jugador 1 ha ganado, fin de la partida!");
-                encurso = false;
-        }
-        else if ((matriz[0][0] === "X" && matriz[1][1] === "X" && matriz[2][2] === "X") ||
-                 (matriz[0][2] === "X" && matriz [1][1] === "X" && matriz[2][0] === "X")){
-                    console.log("El jugador 1 ha ganado, fin de la partida!");
-                    encurso = false;
-        }
-        else if ((matriz[0][0] === "O" && matriz[0][1] === "O" && matriz[0][2] === "O") ||
-                 (matriz[1][0] === "O" && matriz[1][1] === "O" && matriz[1][2] === "O") || 
-                 (matriz[2][0] === "O" && matriz[2][1] === "O" && matriz[2][2] === "O")){
-                    console.log("El jugador 2 ha ganado, fin de la partida!");
-                    encurso = false;
-        }
-        else if((matriz[0][0] === "O" && matriz[1][1] === "O" && matriz[2][2] === "O") ||
-                (matriz[0][2] === "O" && matriz[1][1] === "O" && matriz[2][0] === "O")){
-                    console.log("El jugador 2 ha ganado, fin de la partida!");
-                    encurso = false;
-        }
-        else{
-            console.log("Empate, la partida ha terminado sin ganador!");
-            encurso = false;
-        }
-    }
-}
-
 async function inicio(){
     console.log("¡Bienvenido al tres en raya!"); //Actualizar a ASCII
     await prompt("Pulsa enter para iniciar...");
-        encurso = true;
-    
+    encurso = true;
+    iniciopartida(encurso);
+
+}
+
+function iniciopartida(encurso){       
     //Escoge aleatoriamente si comienza el jugador 1 o 2
     let jugador_actual;
     if (Math.random() < 0.5){
@@ -106,7 +47,6 @@ async function inicio(){
     }
         console.log(`¡El ${jugador_actual} comienza!`);
         mostrartablero();    
-    
     while(encurso){
         comprobarganador()
         if (jugador_actual === jugador1){
@@ -121,4 +61,103 @@ async function inicio(){
         }
     }
 }
+
+
+function turnojugador(jugador){
+    if(encurso){
+        let turno = prompt ("Introduce una celda [Ej: A1]: ");
+        if(turno.length == 2 && posiciones_validas.includes(turno[0].toUpperCase()) && Number(turno[1]) <= 3){
+            //Guardo fila y columna
+            let columna = posiciones_columnas[turno[0].toUpperCase()];
+            let fila = Number(turno[1])-1; //Resta uno ya que la matriz comienza en 0
+            console.log(matriz[fila][columna])
+            if(matriz[fila][columna] === " "){
+                if(jugador == jugador1){
+                    console.log(columna, fila)
+                    matriz[fila][columna] = "X";
+                }
+                else{
+                    matriz[fila][columna] = "O";
+                    console.log(columna, fila)
+                }
+            console.clear();
+            mostrartablero();
+            }
+            else{
+                console.log("Movimiento inválido!");
+                turnojugador(jugador);
+            }
+        }
+        else{
+            console.log("Movimiento inválido!");
+            turnojugador(jugador);
+        }
+    }
+    else{
+        if (Math.random() < 0.5){
+            jugador_actual = jugador1;
+        }
+        else{
+            jugador_actual = jugador2;
+        }
+        console.log(`¡El ${jugador_actual} comienza!`);
+        mostrartablero();
+        encurso = true;   
+    }
+}
+
+function comprobarganador(){
+    if ((matriz[0][0] === "X" && matriz[0][1] === "X" && matriz[0][2] === "X") ||
+        (matriz[1][0] === "X" && matriz[1][1] === "X" && matriz[1][2] === "X") ||
+        (matriz[2][0] === "X" && matriz[2][1] === "X" && matriz[2][2] === "X") ||
+        (matriz[0][0] === "X" && matriz[1][0] === "X" && matriz[2][0] === "X") ||
+        (matriz[0][1] === "X" && matriz[1][1] === "X" && matriz[2][2] === "X") ||
+        (matriz[0][2] === "X" && matriz[1][2] === "X" && matriz[2][2] === "X")){
+            console.log("El jugador 1 ha ganado, fin de la partida!");
+            encurso = false;
+    }
+    else if ((matriz[0][0] === "X" && matriz[1][1] === "X" && matriz[2][2] === "X") ||
+             (matriz[0][2] === "X" && matriz [1][1] === "X" && matriz[2][0] === "X")){
+                console.log("El jugador 1 ha ganado, fin de la partida!");
+                encurso = false;
+    }
+    else if ((matriz[0][0] === "O" && matriz[0][1] === "O" && matriz[0][2] === "O") ||
+             (matriz[1][0] === "O" && matriz[1][1] === "O" && matriz[1][2] === "O") || 
+             (matriz[2][0] === "O" && matriz[2][1] === "O" && matriz[2][2] === "O") ||
+             (matriz[0][0] === "O" && matriz[1][0] === "O" && matriz[2][0] === "O") ||
+             (matriz[0][1] === "O" && matriz[1][1] === "O" && matriz[2][2] === "O") ||
+             (matriz[0][2] === "O" && matriz[1][2] === "O" && matriz[2][2] === "O")){
+                console.log("El jugador 2 ha ganado, fin de la partida!");
+                encurso = false;
+    }
+    else if((matriz[0][0] === "O" && matriz[1][1] === "O" && matriz[2][2] === "O") ||
+            (matriz[0][2] === "O" && matriz[1][1] === "O" && matriz[2][0] === "O")){
+                console.log("El jugador 2 ha ganado, fin de la partida!");
+                encurso = false;
+    }
+    else if((matriz[0][0] != " " && matriz[0][1] != " " && matriz[0][2] != " ") &&
+            (matriz[1][0] != " " && matriz[1][1] != " " && matriz[1][2] != " ") &&
+            (matriz[2][0] != " " && matriz[2][1] != " " && matriz[2][2] != " ") &&
+            (matriz[0][0] != " " && matriz[1][1] != " " && matriz[2][2] != " ") &&
+            (matriz[0][2] != " " && matriz [1][1] != " " && matriz[2][0] != " ")){
+                console.log("Empate, la partida ha terminado sin ganador!");
+                encurso = false;
+    }
+
+    if (encurso == false) {
+        let inicio = prompt("¿Comenzar nueva partida? S/N: ");
+        if (inicio.toLowerCase() === "s") {
+            console.clear();
+            matriz = [
+                [" ", " ", " "],
+                [" ", " ", " "],
+                [" ", " ", " "]
+            ];
+        } else {
+            console.log("Saliendo...");
+            process.exit();
+        }
+    }
+}
+
 inicio()
